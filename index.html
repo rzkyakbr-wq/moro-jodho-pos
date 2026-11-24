@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Toko Tembakau Moro Jodho - POS & Catalog System</title>
+  <!-- Favicon / Brand Icon menggunakan Gambar Logo Kedua -->
+  <link rel="icon" type="image/jpeg" href="assets/logo-icon.jpg">
+  <!-- FontAwesome CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --primary: #1e1e1e;
+      --primary-accent: #c6a052;
+      --gold-hover: #e5b95f;
+      --bg-dark: #121212;
+      --card-bg: #1a1a1a;
+      --card-border: #2a2a2a;
+      --text-light: #f0f0f0;
+      --text-muted: #a0a0a0;
+      --success: #2ecc71;
+      --danger: #e74c3c;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+    body { background-color: var(--bg-dark); color: var(--text-light); line-height: 1.6; }
+
+    /* HEADER & BRANDING */
+    header {
+      background: rgba(26, 26, 26, 0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--card-border);
+      padding: 12px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .brand-logo-container {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .brand-logo-img {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--primary-accent);
+    }
+
+    .brand-title h1 {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--primary-accent);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .brand-title p {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      letter-spacing: 0.5px;
+    }
+
+    /* NAVIGATION BUTTONS */
+    nav { display: flex; gap: 10px; }
+    nav button {
+      background: #252525;
+      color: var(--text-light);
+      border: 1px solid var(--card-border);
+      padding: 8px 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: all 0.25s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    nav button:hover, nav button.active {
+      background: var(--primary-accent);
+      color: #000;
+      border-color: var(--primary-accent);
+      box-shadow: 0 4px 12px rgba(198, 160, 82, 0.3);
+    }
+
+    /* CONTAINER & CARDS */
+    .container { padding: 25px; max-width: 1300px; margin: 0 auto; }
+    
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    }
+
+    .card h2 {
+      font-size: 1.2rem;
+      color: var(--primary-accent);
+      border-bottom: 1px solid var(--card-border);
+      padding-bottom: 12px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* PROFILE HERO HERO BANNER WITH FIRST IMAGE */
+    .profile-hero-banner {
+      background: linear-gradient(180deg, rgba(18, 18, 18, 0.4) 0%, rgba(18, 18, 18, 0.95) 100%), 
+                  url('assets/hero-bg.jpg') center/cover no-repeat;
+      border-radius: 16px;
+      padding: 40px 30px;
+      margin-bottom: 25px;
+      border: 1px solid var(--card-border);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      min-height: 220px;
+    }
+
+    .profile-hero-banner h2 {
+      font-size: 2.2rem;
+      color: #fff;
+      font-weight: 800;
+      margin-bottom: 8px;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+    }
+
+    .profile-hero-banner p {
+      color: var(--text-light);
+      font-size: 1rem;
+      max-width: 750px;
+      margin-bottom: 18px;
+    }
+
+    .profile-meta-tags {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+
+    .meta-tag {
+      background: rgba(0, 0, 0, 0.65);
+      border: 1px solid rgba(198, 160, 82, 0.5);
+      color: var(--primary-accent);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+
+    .meta-tag:hover {
+      background: var(--primary-accent);
+      color: #000;
+    }
+
+    /* VARIANT FILTER BUTTONS */
+    .filter-bar {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      padding-bottom: 10px;
+      margin-bottom: 20px;
+    }
+
+    .filter-btn {
+      background: #222;
+      color: var(--text-muted);
+      border: 1px solid var(--card-border);
+      padding: 8px 16px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+
+    .filter-btn.active, .filter-btn:hover {
+      background: var(--primary-accent);
+      color: #000;
+      font-weight: 700;
+      border-color: var(--primary-accent);
+    }
+
+    /* CATALOG GRID & CARDS */
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+      gap: 20px;
+    }
+
+    .product-card {
+      background: #202020;
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 0.25s, box-shadow 0.25s;
+    }
+
+    .product-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+      border-color: var(--primary-accent);
+    }
+
+    .product-img-wrapper {
+      width: 100%;
+      height: 160px;
+      background: #151515;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .product-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s;
+    }
+
+    .product-card:hover .product-img {
+      transform: scale(1.08);
+    }
+
+    .unit-badge {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(0,0,0,0.8);
+      color: var(--primary-accent);
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 0.72rem;
+      font-weight: bold;
+      border: 1px solid var(--primary-accent);
+    }
+
+    .product-details {
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      justify-content: space-between;
+    }
+
+    .product-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text-light);
+      margin-bottom: 6px;
+    }
+
+    .product-category {
+      font-size: 0.75rem;
+      color: var(--primary-accent);
+      text-transform: uppercase;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .product-price {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 12px;
+    }
+
+    .btn-add-cart {
+      background: var(--primary-accent);
+      color: #000;
+      border: none;
+      padding: 10px;
+      border-radius: 8px;
+      font-weight: 700;
+      cursor: pointer;
+      width: 100%;
+      transition: background 0.2s;
+    }
+
+    .btn-add-cart:hover {
+      background: var(--gold-hover);
+    }
+
+    /* WHATSAPP ORDER BUTTON */
+    .btn-wa-order {
+      background: #25D366;
+      color: #fff;
+      border: none;
+      padding: 14px;
+      border-radius: 10px;
+      font-size: 1.05rem;
+      font-weight: 800;
+      width: 100%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: background 0.2s;
+    }
+
+    .btn-wa-order:hover {
+      background: #1eb956;
+    }
+
+    /* UTILITY CLASSES */
+    .hidden { display: none !important; }
+    
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    table th, table td { border: 1px solid var(--card-border); padding: 12px; text-align: left; font-size: 0.88rem; }
+    table th { background: #222; color: var(--primary-accent); font-weight: 700; }
+
+    input, select, textarea {
+      background: #222;
+      border: 1px solid var(--card-border);
+      color: #fff;
+      padding: 10px;
+      border-radius: 8px;
+      width: 100%;
+      margin-bottom: 12px;
+    }
+
+    /* STATS DASHBOARD */
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-bottom: 20px; }
+    .stat-card { background: #202020; border: 1px solid var(--card-border); padding: 20px; border-radius: 10px; border-left: 4px solid var(--primary-accent); }
+    .stat-card h4 { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; }
+    .stat-card p { font-size: 1.4rem; font-weight: bold; color: #fff; margin-top: 5px; }
+
+    /* STRUK PRINT */
+    #receipt-print { display: none; }
+    @media print {
+      body * { visibility: hidden; }
+      #receipt-print, #receipt-print * { visibility: visible; }
+      #receipt-print { display: block; position: absolute; left: 0; top: 0; width: 300px; padding: 10px; font-family: monospace; color: #000; background: #fff; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER BRANDING -->
+  <header>
+    <div class="brand-logo-container">
+      <img src="assets/logo-icon.jpg" alt="Logo Toko Moro Jodho" class="brand-logo-img">
+      <div class="brand-title">
+        <h1>Moro Jodho</h1>
+        <p>Indonesian Tobacco & Tobacconist Store</p>
+      </div>
+    </div>
+    <nav>
+      <button onclick="switchRole('customer')" id="btn-customer" class="active"><i class="fa-solid fa-store"></i> Katalog & Pesan</button>
+      <button onclick="switchRole('kasir')" id="btn-kasir"><i class="fa-solid fa-cash-register"></i> Kasir (POS)</button>
+      <button onclick="switchRole('owner')" id="btn-owner"><i class="fa-solid fa-chart-line"></i> Owner Panel</button>
+      <button onclick="logout()" id="btn-logout" class="hidden" style="background: var(--danger);"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+    </nav>
+  </header>
+
+  <div class="container">
+
+    <!-- MODAL LOGIN SYSTEM -->
+    <div id="section-login" class="card hidden" style="max-width: 420px; margin: 40px auto;">
+      <h2 id="login-title"><i class="fa-solid fa-lock"></i> Akses Masuk Sistem</h2>
+      <form onsubmit="handleLogin(event)">
+        <label style="font-size: 0.85rem; color: var(--text-muted);">Nama Kasir / Owner</label>
+        <input type="text" id="login-username" placeholder="Masukkan nama..." required>
+        <label style="font-size: 0.85rem; color: var(--text-muted);">PIN / Password</label>
+        <input type="password" id="login-password" placeholder="PIN Akses..." required>
+        <button type="submit" class="btn-add-cart" style="margin-top: 10px;">Masuk Sekarang</button>
+      </form>
+      <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 15px; text-align: center;">
+        PIN Kasir: <b>kasir123</b> | PIN Owner: <b>owner123</b>
+      </p>
+    </div>
+
+    <!-- TAMPILAN PELANGGAN (CUSTOMER DASHBOARD) -->
+    <div id="section-customer">
+      
+      <!-- HERO PROFIL TOKO BANNER -->
+      <div class="profile-hero-banner">
+        <h2>Toko Moro Jodho Tobacco</h2>
+        <p>Penyedia racikan tembakau mole pilihan, virginia premium, cengkeh rajang aromatik, papir manis, serta aksesoris meracik lengkap di Semarang.</p>
+        <div class="profile-meta-tags">
+          <a href="https://maps.app.goo.gl/DZRpVj27LzvUehgQ6" target="_blank" class="meta-tag">
+            <i class="fa-solid fa-location-dot"></i> Jl. Simongan, Semarang (Google Maps)
+          </a>
+          <a href="https://wa.me/6285728040343" target="_blank" class="meta-tag">
+            <i class="fa-brands fa-whatsapp"></i> +62 857-2804-0343
+          </a>
+          <span class="meta-tag">
+            <i class="fa-solid fa-clock"></i> Buka Setiap Hari: 09:00 - 21:00 WIB
+          </span>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 24px; flex-wrap: wrap;">
+        
+        <!-- KATALOG BARANG & FILTER -->
+        <div style="flex: 2; min-width: 320px;">
+          <div class="card">
+            <h2><i class="fa-solid fa-boxes-stacked"></i> Katalog Produk Tembakau & Aksesoris</h2>
+            
+            <!-- FILTER VARIAN -->
+            <div class="filter-bar">
+              <button class="filter-btn active" onclick="filterKategori('all')">Semua Produk</button>
+              <button class="filter-btn" onclick="filterKategori('tembako olahan')">Tembako Olahan</button>
+              <button class="filter-btn" onclick="filterKategori('original')">Original</button>
+              <button class="filter-btn" onclick="filterKategori('racik')">Racik</button>
+              <button class="filter-btn" onclick="filterKategori('papir')">Papir</button>
+              <button class="filter-btn" onclick="filterKategori('cengkeh')">Cengkeh</button>
+              <button class="filter-btn" onclick="filterKategori('aksesoris')">Aksesoris</button>
+              <button class="filter-btn" onclick="filterKategori('alat')">Alat</button>
+            </div>
+
+            <div class="product-grid" id="customer-catalog-grid"></div>
+          </div>
+        </div>
+
+        <!-- KERANJANG BELANJA WA -->
+        <div style="flex: 1; min-width: 280px;">
+          <div class="card" style="position: sticky; top: 85px;">
+            <h2><i class="fa-solid fa-cart-shopping"></i> Keranjang Pesanan</h2>
+            <div id="wa-cart-list" style="margin-bottom: 15px;"></div>
+            <hr style="border: none; border-top: 1px dashed var(--card-border); margin: 12px 0;">
+            <p style="font-weight: bold; font-size: 1.1rem; display: flex; justify-content: space-between; margin-bottom: 15px;">
+              Total Estimasi: <span id="wa-cart-total" style="color: var(--primary-accent);">Rp 0</span>
+            </p>
+            <button class="btn-wa-order" onclick="kirimPesananWA()">
+              <i class="fa-brands fa-whatsapp"></i> Pesan via WhatsApp
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- TAMPILAN KASIR (POS SYSTEM) -->
+    <div id="section-kasir" class="hidden">
+      <div class="card">
+        <h2>📋 Absensi Kehadiran Staf Kasir</h2>
+        <form onsubmit="simpanAbsensi(event)">
+          <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+            <select id="absen-shift" required style="flex: 1;">
+              <option value="Shift Pagi (09:00 - 15:00)">Shift Pagi (09:00 - 15:00)</option>
+              <option value="Shift Sore (15:00 - 21:00)">Shift Sore (15:00 - 21:00)</option>
+            </select>
+            <select id="absen-status" required style="flex: 1;">
+              <option value="Hadir">Hadir Kerja</option>
+              <option value="Izin">Izin</option>
+              <option value="Sakit">Sakit</option>
+            </select>
+          </div>
+          <input type="text" id="absen-catatan" placeholder="Catatan shift (Opsional)">
+          <button type="submit" class="btn-add-cart">Simpan Absensi</button>
+        </form>
+      </div>
+
+      <div class="card">
+        <h2>🛒 Kasir Penjualan Toko (POS)</h2>
+        <div style="display: flex; gap: 24px; flex-wrap: wrap;">
+          <div style="flex: 2; min-width: 320px;">
+            <div class="product-grid" id="kasir-catalog-grid"></div>
+          </div>
+          <div style="flex: 1; min-width: 300px; background: #202020; padding: 20px; border-radius: 12px; border: 1px solid var(--card-border);">
+            <h3>Detail Struk Transaksi</h3>
+            <div id="cart-pos-items" style="margin: 15px 0;"></div>
+            <hr style="margin: 12px 0; border-color: var(--card-border);">
+            <p style="font-weight: bold; font-size: 1.15rem; display: flex; justify-content: space-between; margin-bottom: 12px;">
+              Total Tagihan: <span id="cart-pos-total" style="color: var(--primary-accent);">Rp 0</span>
+            </p>
+            <label style="font-size: 0.85rem;">Uang Tunai Konsumen:</label>
+            <input type="number" id="bayar-uang" placeholder="Rp 0" oninput="hitungKembalian()">
+            <p style="font-weight: bold; color: var(--danger); margin-bottom: 15px; font-size: 1.05rem;">
+              Kembalian: <span id="bayar-kembali">Rp 0</span>
+            </p>
+            <button class="btn-add-cart" onclick="prosesTransaksi()">Proses & Cetak Struk Thermal</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAMPILAN OWNER PANEL -->
+    <div id="section-owner" class="hidden">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <h4>Total Omset Penjualan</h4>
+          <p id="stat-omset">Rp 0</p>
+        </div>
+        <div class="stat-card">
+          <h4>Total Pengeluaran Kulakan</h4>
+          <p id="stat-beli">Rp 0</p>
+        </div>
+        <div class="stat-card">
+          <h4>Estimasi Profit Clean</h4>
+          <p id="stat-profit">Rp 0</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>📊 Diagram Visual Ringkasan Finansial Toko</h2>
+        <div style="height: 300px; position: relative;">
+          <canvas id="financialChart"></canvas>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>📦 Input & Restock Kulakan Barang (XAMPP MySQL)</h2>
+        <form onsubmit="simpanProduk(event)">
+          <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+            <input type="text" id="prod-nama" placeholder="Nama Produk Tembakau / Aksesoris" required style="flex: 2;">
+            <select id="prod-kategori" style="flex: 1;">
+              <option value="tembako olahan">Tembako Olahan</option>
+              <option value="original">Original</option>
+              <option value="racik">Racik</option>
+              <option value="papir">Papir</option>
+              <option value="cengkeh">Cengkeh</option>
+              <option value="aksesoris">Aksesoris</option>
+              <option value="alat">Alat</option>
+            </select>
+            <select id="prod-satuan" style="flex: 1;">
+              <option value="gram">gram</option>
+              <option value="pics">pics</option>
+              <option value="pack">pack</option>
+            </select>
+          </div>
+          <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+            <input type="number" id="prod-stok" placeholder="Jumlah Stok Beli" required style="flex: 1;">
+            <input type="number" id="prod-hargabeli" placeholder="Harga Modal Beli (Per Satuan)" required style="flex: 1;">
+            <input type="number" id="prod-hargajual" placeholder="Harga Jual Toko (Per Satuan)" required style="flex: 1;">
+          </div>
+          <input type="url" id="prod-gambar" placeholder="URL Link Gambar Produk (https://...)">
+          <button type="submit" class="btn-add-cart">Simpan Produk & Catat Kulakan</button>
+        </form>
+      </div>
+
+      <div class="card">
+        <h2>🛍️ Data Produk di Database MySQL (XAMPP)</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Gambar</th>
+              <th>Nama Barang</th>
+              <th>Kategori</th>
+              <th>Satuan</th>
+              <th>Stok</th>
+              <th>Harga Modal</th>
+              <th>Harga Jual</th>
+            </tr>
+          </thead>
+          <tbody id="table-owner-produk"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- TEMPLATE STRUK PRINT -->
+  <div id="receipt-print">
+    <div style="text-align: center; margin-bottom: 8px;">
+      <h3>TOKO MORO JODHO TOBACCO</h3>
+      <p style="font-size: 10px;">Jl. Simongan, Semarang Barat</p>
+      <p style="font-size: 10px;">WA: +62 857-2804-0343</p>
+      <p>================================</p>
+    </div>
+    <div style="font-size: 11px;">
+      <p>ID: <span id="print-id"></span></p>
+      <p>WAKTU: <span id="print-waktu"></span></p>
+      <p>KASIR: <b id="print-kasir"></b></p>
+    </div>
+    <p>================================</p>
+    <div id="print-items" style="font-size: 11px;"></div>
+    <p>================================</p>
+    <div style="font-size: 11px;">
+      <p style="display: flex; justify-content: space-between;"><span>TOTAL:</span> <span id="print-total"></span></p>
+      <p style="display: flex; justify-content: space-between;"><span>BAYAR:</span> <span id="print-bayar"></span></p>
+      <p style="display: flex; justify-content: space-between;"><span>KEMBALI:</span> <span id="print-kembali"></span></p>
+    </div>
+    <p style="text-align: center; margin-top: 10px; font-size: 10px;">
+      Matur Nuwun Sampun Belanja! 🍂
+    </p>
+  </div>
+
+  <script>
+    const API_URL = 'api.php';
+    let db = { produk: [], absensi: [], penjualan: [], pembelian: [] };
+    let activeFilter = 'all';
+    let waCart = [];
+    let posCart = [];
+    let currentUser = null;
+    let financialChartInstance = null;
+
+    async function loadXAMPPData() {
+      try {
+        const res = await fetch(API_URL + '?action=get_all');
+        const data = await res.json();
+        db = data;
+        renderCustomerCatalog();
+        if (currentUser && currentUser.role === 'kasir') renderKasirCatalog();
+        if (currentUser && currentUser.role === 'owner') renderOwnerDashboard();
+      } catch (e) {
+        console.error('Gagal mengambil data dari API XAMPP MySQL:', e);
+      }
+    }
+
+    function formatRupiah(n) {
+      return 'Rp ' + Number(n).toLocaleString('id-ID');
+    }
+
+    function filterKategori(kat) {
+      activeFilter = kat;
+      document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+      renderCustomerCatalog();
+    }
+
+    function renderCustomerCatalog() {
+      const container = document.getElementById('customer-catalog-grid');
+      const filtered = activeFilter === 'all' ? db.produk : db.produk.filter(p => p.kategori.toLowerCase() === activeFilter.toLowerCase());
+      
+      container.innerHTML = filtered.map(p => `
+        <div class="product-card">
+          <div class="product-img-wrapper">
+            <span class="unit-badge">${p.satuan}</span>
+            <img src="${p.gambar || 'assets/logo-icon.jpg'}" alt="${p.nama}" class="product-img" onerror="this.src='assets/logo-icon.jpg'">
+          </div>
+          <div class="product-details">
+            <div>
+              <div class="product-category">${p.kategori}</div>
+              <div class="product-title">${p.nama}</div>
+              <div class="product-price">${formatRupiah(p.harga_jual)} / ${p.satuan}</div>
+            </div>
+            <button class="btn-add-cart" onclick="addToWACart(${p.id})">+ Tambah Pesanan</button>
+          </div>
+        </div>
+      `).join('') || '<p style="color:var(--text-muted);">Tidak ada produk dalam varian ini.</p>';
+    }
+
+    function addToWACart(id) {
+      const p = db.produk.find(prod => prod.id == id);
+      const item = waCart.find(i => i.id == id);
+      if (item) item.qty++;
+      else waCart.push({ ...p, qty: 1 });
+      renderWACart();
+    }
+
+    function renderWACart() {
+      const container = document.getElementById('wa-cart-list');
+      let total = 0;
+      container.innerHTML = waCart.map((i, idx) => {
+        const sub = i.harga_jual * i.qty;
+        total += sub;
+        return `
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; font-size:0.85rem;">
+            <div>
+              <b>${i.nama}</b><br>
+              <span style="color:var(--text-muted);">${i.qty} ${i.satuan} x ${formatRupiah(i.harga_jual)}</span>
+            </div>
+            <button style="background:var(--danger); color:#fff; border:none; padding:4px 8px; border-radius:4px; cursor:pointer;" onclick="waCart.splice(${idx},1); renderWACart();">x</button>
+          </div>
+        `;
+      }).join('') || '<p style="color:var(--text-muted); font-size:0.85rem;">Keranjang belanja kosong.</p>';
+
+      document.getElementById('wa-cart-total').innerText = formatRupiah(total);
+    }
+
+    function kirimPesananWA() {
+      if (waCart.length === 0) return alert('Silakan pilih produk terlebih dahulu!');
+      const noWA = "6285728040343";
+      let pesan = "Halo Toko Moro Jodho Tobacco, saya ingin memesan:\n\n";
+      let total = 0;
+      waCart.forEach((item, i) => {
+        const sub = item.harga_jual * item.qty;
+        total += sub;
+        pesan += `${i+1}. ${item.nama} (${item.qty} ${item.satuan}) = ${formatRupiah(sub)}\n`;
+      });
+      pesan += `\n*Total Estimasi: ${formatRupiah(total)}*\n\nMohon info ketersediaannya, terima kasih!`;
+      window.open(`https://wa.me/${noWA}?text=${encodeURIComponent(pesan)}`, '_blank');
+    }
+
+    function switchRole(role) {
+      if (role === 'customer') return renderRole('customer');
+      if (currentUser && currentUser.role === role) return renderRole(role);
+      
+      document.getElementById('section-customer').classList.add('hidden');
+      document.getElementById('section-kasir').classList.add('hidden');
+      document.getElementById('section-owner').classList.add('hidden');
+      document.getElementById('section-login').classList.remove('hidden');
+      document.getElementById('section-login').dataset.targetRole = role;
+    }
+
+    function handleLogin(e) {
+      e.preventDefault();
+      const u = document.getElementById('login-username').value;
+      const p = document.getElementById('login-password').value;
+      const target = document.getElementById('section-login').dataset.targetRole;
+
+      if (target === 'kasir' && p === 'kasir123') currentUser = { username: u, role: 'kasir' };
+      else if (target === 'owner' && p === 'owner123') currentUser = { username: u, role: 'owner' };
+      else return alert('PIN Akses Salah!');
+
+      renderRole(target);
+    }
+
+    function logout() { currentUser = null; switchRole('customer'); }
+
+    function renderRole(role) {
+      document.getElementById('section-login').classList.add('hidden');
+      document.getElementById('section-customer').classList.toggle('hidden', role !== 'customer');
+      document.getElementById('section-kasir').classList.toggle('hidden', role !== 'kasir');
+      document.getElementById('section-owner').classList.toggle('hidden', role !== 'owner');
+
+      document.getElementById('btn-customer').classList.toggle('active', role === 'customer');
+      document.getElementById('btn-kasir').classList.toggle('active', role === 'kasir');
+      document.getElementById('btn-owner').classList.toggle('active', role === 'owner');
+      document.getElementById('btn-logout').classList.toggle('hidden', role === 'customer');
+
+      if (role === 'kasir') renderKasirCatalog();
+      if (role === 'owner') renderOwnerDashboard();
+    }
+
+    function renderKasirCatalog() {
+      const container = document.getElementById('kasir-catalog-grid');
+      container.innerHTML = db.produk.map(p => `
+        <div class="product-card">
+          <div class="product-details">
+            <div class="product-title">${p.nama}</div>
+            <div class="product-price">${formatRupiah(p.harga_jual)} / ${p.satuan}</div>
+            <div style="font-size:0.8rem; color:var(--text-muted); margin-bottom:10px;">Stok: ${p.stok}</div>
+            <button class="btn-add-cart" onclick="addToPOSCart(${p.id})">+ Pilih Item</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function addToPOSCart(id) {
+      const p = db.produk.find(prod => prod.id == id);
+      const item = posCart.find(i => i.id == id);
+      if (item) item.qty++;
+      else posCart.push({ ...p, qty: 1 });
+      renderPOSCart();
+    }
+
+    function renderPOSCart() {
+      const container = document.getElementById('cart-pos-items');
+      let total = 0;
+      container.innerHTML = posCart.map((i, idx) => {
+        const sub = i.harga_jual * i.qty;
+        total += sub;
+        return `
+          <div style="display:flex; justify-content:space-between; font-size:0.85rem; margin-bottom:6px;">
+            <span>${i.nama} (${i.qty} ${i.satuan})</span>
+            <span>${formatRupiah(sub)}</span>
+          </div>
+        `;
+      }).join('') || '<p style="color:var(--text-muted); font-size:0.85rem;">Belum ada item dipilih.</p>';
+      document.getElementById('cart-pos-total').innerText = formatRupiah(total);
+      hitungKembalian();
+    }
+
+    function hitungKembalian() {
+      const total = posCart.reduce((a, i) => a + (i.harga_jual * i.qty), 0);
+      const bayar = Number(document.getElementById('bayar-uang').value) || 0;
+      document.getElementById('bayar-kembali').innerText = formatRupiah(bayar > total ? bayar - total : 0);
+    }
+
+    async function prosesTransaksi() {
+      const total = posCart.reduce((a, i) => a + (i.harga_jual * i.qty), 0);
+      const bayar = Number(document.getElementById('bayar-uang').value) || 0;
+      if (posCart.length === 0) return alert('Keranjang Kasir Kosong!');
+      if (bayar < total) return alert('Uang Tunai Kurang!');
+
+      const trx = {
+        id: 'TRX-' + Date.now().toString().slice(-6),
+        waktu: new Date().toLocaleString('id-ID'),
+        kasir: currentUser ? currentUser.username : 'Kasir',
+        items: posCart,
+        total: total,
+        bayar: bayar,
+        kembali: bayar - total
+      };
+
+      await fetch(API_URL + '?action=add_penjualan', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(trx)
+      });
+
+      cetakStruk(trx);
+      posCart = [];
+      document.getElementById('bayar-uang').value = '';
+      await loadXAMPPData();
+    }
+
+    function cetakStruk(trx) {
+      document.getElementById('print-id').innerText = trx.id;
+      document.getElementById('print-waktu').innerText = trx.waktu;
+      document.getElementById('print-kasir').innerText = trx.kasir;
+      document.getElementById('print-items').innerHTML = trx.items.map(i => `
+        <div style="display:flex; justify-content:space-between;">
+          <span>${i.nama} x${i.qty}</span>
+          <span>${formatRupiah(i.harga_jual * i.qty)}</span>
+        </div>
+      `).join('');
+      document.getElementById('print-total').innerText = formatRupiah(trx.total);
+      document.getElementById('print-bayar').innerText = formatRupiah(trx.bayar);
+      document.getElementById('print-kembali').innerText = formatRupiah(trx.kembali);
+      window.print();
+    }
+
+    async function simpanAbsensi(e) {
+      e.preventDefault();
+      await fetch(API_URL + '?action=add_absensi', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          waktu: new Date().toLocaleString('id-ID'),
+          karyawan: currentUser.username,
+          shift: document.getElementById('absen-shift').value,
+          status: document.getElementById('absen-status').value,
+          catatan: document.getElementById('absen-catatan').value || '-'
+        })
+      });
+      alert('Absensi tersimpan di XAMPP Database!');
+      document.getElementById('absen-catatan').value = '';
+    }
+
+    async function simpanProduk(e) {
+      e.preventDefault();
+      const pData = {
+        nama: document.getElementById('prod-nama').value,
+        kategori: document.getElementById('prod-kategori').value,
+        satuan: document.getElementById('prod-satuan').value,
+        stok: Number(document.getElementById('prod-stok').value),
+        harga_beli: Number(document.getElementById('prod-hargabeli').value),
+        harga_jual: Number(document.getElementById('prod-hargajual').value),
+        gambar: document.getElementById('prod-gambar').value
+      };
+
+      await fetch(API_URL + '?action=add_produk', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(pData)
+      });
+
+      alert('Produk Baru Berhasil Disimpan di Database MySQL XAMPP!');
+      await loadXAMPPData();
+    }
+
+    function renderOwnerDashboard() {
+      const omset = db.penjualan.reduce((a, t) => a + Number(t.total), 0);
+      const kulakan = db.pembelian.reduce((a, b) => a + (Number(b.harga_beli) * Number(b.jumlah)), 0);
+      const profit = omset - kulakan;
+
+      document.getElementById('stat-omset').innerText = formatRupiah(omset);
+      document.getElementById('stat-beli').innerText = formatRupiah(kulakan);
+      document.getElementById('stat-profit').innerText = formatRupiah(profit);
+
+      renderFinancialChart(omset, kulakan, profit);
+
+      document.getElementById('table-owner-produk').innerHTML = db.produk.map(p => `
+        <tr>
+          <td><img src="${p.gambar || 'assets/logo-icon.jpg'}" style="width:40px; height:40px; border-radius:6px; object-fit:cover;"></td>
+          <td><b>${p.nama}</b></td>
+          <td>${p.kategori}</td>
+          <td>${p.satuan}</td>
+          <td>${p.stok}</td>
+          <td>${formatRupiah(p.harga_beli)}</td>
+          <td><b>${formatRupiah(p.harga_jual)}</b></td>
+        </tr>
+      `).join('');
+    }
+
+    function renderFinancialChart(omset, kulakan, profit) {
+      const ctx = document.getElementById('financialChart').getContext('2d');
+      if (financialChartInstance) financialChartInstance.destroy();
+
+      financialChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['Total Omset', 'Total Kulakan', 'Estimasi Profit'],
+          datasets: [{
+            data: [omset, kulakan, profit],
+            backgroundColor: ['#c6a052', '#e74c3c', '#2ecc71']
+          }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+      });
+    }
+
+    loadXAMPPData();
+  </script>
+</body>
+</html>
